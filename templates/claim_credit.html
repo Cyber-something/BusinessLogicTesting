@@ -1,0 +1,18 @@
+{% extends "account_template.html" %}
+
+{% block account %}
+  <form>
+    <div class="mb-3 row">
+      <label for="inputPassword" class="col-sm-2 col-form-label">Amount</label>
+      <div class="col-sm-10">
+        <input type="text" class="form-control">
+        <div class="form-text">Add a voucher code to claim credit</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-10 offset-md-2">
+        <button type="submit" class="btn btn-success">Claim</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}
