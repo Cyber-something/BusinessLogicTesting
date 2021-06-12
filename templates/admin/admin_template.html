@@ -1,0 +1,22 @@
+{% extends "base_template.html" %}
+
+{% block content %}
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if opt==1 %} active {% endif %}" href="{{ url_for('admin_users') }}">Users</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if opt==2 %} active {% endif %}" href="{{ url_for('admin_crypto') }}">Crypto</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if opt==3 %} active {% endif %}" href="{{ url_for('admin_orders') }}">Orders</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if opt==4 %} active {% endif %}" href="{{ url_for('admin_vouchers') }}">Voucher</a>
+  </li>
+</ul>
+
+  {% block admin_content %}
+  {% endblock %}
+
+{% endblock %}

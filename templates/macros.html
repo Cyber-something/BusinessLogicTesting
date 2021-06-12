@@ -1,0 +1,9 @@
+{% macro tab(manu, active_index)%}
+<ul class="nav nav-tabs mb-3">
+  {% for item in menu %}
+  <li class="nav-item">
+    <a class="nav-link active" href="#">item</a>
+  </li>
+  {% endfor %}
+</ul>
+{%- endmacro %}

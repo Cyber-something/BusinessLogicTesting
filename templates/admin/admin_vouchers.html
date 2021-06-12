@@ -1,0 +1,22 @@
+{% extends "admin/admin_template.html" %}
+
+{% block admin_content %}
+<ul class="list-group">
+  <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-start">
+    <div class="text-muted"><strong>Code</strong></div>
+    <div class="text-muted">Status</div>
+    <div class="text-muted">Percentage (%)</div>
+  </li>
+  {% for v in vouchers %}
+  <li class="list-group-item d-flex justify-content-between align-items-start">
+    <div>{{ v.code }}</div>
+    {% if not v.user_id %}
+    <span class="badge bg-success">available</span>
+    {% else %}
+    <span class="badge bg-danger">used</span>
+    {% endif %}
+    <div>{{ v.percentage }}</div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -50,17 +51,74 @@ def claim_credit():
 
 @app.get('/admin')
 def admin():
-    return render_template('admin.html')
+    return redirect(url_for("admin_users"))
 
+@app.get('/admin/users')
+def admin_users():
+    users = User.query.all()
+    return render_template('admin/admin_users.html', opt=1, users=users)
+
+@app.get('/admin/crypto')
+def admin_crypto():
+    crypto = Crypto.query.all()
+    return render_template('admin/admin_crypto.html', opt=2, crypto=crypto)
+
+@app.get('/admin/orders')
+def admin_orders():
+    orders = Order.query.all()
+    return render_template('admin/admin_orders.html', opt=3, orders=orders)
+
+@app.get('/admin/vouchers')
+def admin_vouchers():
+    vouchers = Voucher.query.all()
+    return render_template('admin/admin_vouchers.html', opt=4, vouchers=vouchers)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, unique=True, nullable=False)
+    password = db.Column(db.String, nullable=False)
+    sess = db.Column(db.String)
+    credit = db.Column(db.Integer, default=100)
+    quantity = db.Column(db.Integer, default=0)
+    price = db.Column(db.Integer, default=0)
+
+    orders = db.relationship('Order', backref='user', lazy=True)
+
+    def __repr__(self):
+        return '<User %r>' % self.username
+
+
+class Crypto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    icon = db.Column(db.Text, nullable=False)
+
+    orders = db.relationship('Order', backref='crypto', lazy=True)
+
+    def __repr__(self):
+        return '<Crypto %r>' % self.name
+
+
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    quantity = db.Column(db.Integer, default=0)
+    price = db.Column(db.Integer, default=0)
+    crypto_id = db.Column(db.Integer, db.ForeignKey('crypto.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+
+class Voucher(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String, nullable=False)
+    percentage = db.Column(db.Integer, nullable=False, default=0)
+
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    user = db.relationship('User', backref='vouchers', lazy=True)
 
 
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
-
-    def __repr__(self):
-        return '<User %r>' % self.username
