@@ -48,8 +48,19 @@ def transfer_credit():
 def claim_credit():
     return render_template('claim_credit.html', opt=4)
 
+@app.get('/admin')
+def admin():
+    return render_template('admin.html')
+
 
 
 if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, unique=True, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.username
