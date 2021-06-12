@@ -4,12 +4,9 @@
   <div class="row">
     <div class="col-6">
       <div class="feature-icon bg-secondary bg-gradient">
-        <svg xmlns="http://www.w3.org/2000/svg" width="5rem" height="5rem" fill="currentColor"
-          class="bi bi-currency-bitcoin" viewBox="0 0 16 16">
-          <path d="M5.5 13v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.5v1.25c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25V13h.084c1.992 0 3.416-1.033 3.416-2.82 0-1.502-1.007-2.323-2.186-2.44v-.088c.97-.242 1.683-.974 1.683-2.19C11.997 3.93 10.847 3 9.092 3H9V1.75a.25.25 0 0 0-.25-.25h-1a.25.25 0 0 0-.25.25V3h-.573V1.75a.25.25 0 0 0-.25-.25H5.75a.25.25 0 0 0-.25.25V3l-1.998.011a.25.25 0 0 0-.25.25v.989c0 .137.11.25.248.25l.755-.005a.75.75 0 0 1 .745.75v5.505a.75.75 0 0 1-.75.75l-.748.011a.25.25 0 0 0-.25.25v1c0 .138.112.25.25.25L5.5 13zm1.427-8.513h1.719c.906 0 1.438.498 1.438 1.312 0 .871-.575 1.362-1.877 1.362h-1.28V4.487zm0 4.051h1.84c1.137 0 1.756.58 1.756 1.524 0 .953-.626 1.45-2.158 1.45H6.927V8.539z" />
-        </svg>
+        {{ crypto.icon|safe }}
       </div>
-      <h2>Bitcoin</h2>
+      <h2>{{ crypto.name }}</h2>
       <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and
         probably just keep going until we run out of words.</p>
     </div>
@@ -18,31 +15,37 @@
         <div class="mb-3 row">
           <label for="staticEmail" class="col-sm-3 col-form-label">Price ($)</label>
           <div class="col-sm-9">
-            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="125">
+            <input id="price_cart" type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ crypto.price }}">
           </div>
         </div>
         <div class="mb-3 row">
           <label for="staticEmail" class="col-sm-3 col-form-label">Quantity</label>
           <div class="col-sm-9">
-            <select class="form-select" aria-label="Default select example">
-              <option value="1.0" selected>1</option>
-              <option value="2.0">2</option>
-              <option value="3.0">3</option>
+            <select id="quantity_cart" class="form-select" aria-label="Default select example" onchange="update_total(this)">
+              {% for x in range(1,20) %}
+                {% if x == user.quantity %}
+                  <option value="{{ x }}" selected>{{ x }}</option>
+                {% else %}
+                  <option value="{{ x }}">{{ x }}</option>
+                {% endif %}
+              {% endfor %}
             </select>
           </div>
         </div>
 
+        {% if user.discount > 0 %}
         <div class="mb-3 row">
           <label for="staticEmail" class="col-sm-3 col-form-label">Discount (%)</label>
           <div class="col-sm-9">
-            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="10">
+            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.discount }}">
           </div>
         </div>
+        {% endif %}
 
         <div class="mb-3 row">
           <label for="staticEmail" class="col-sm-3 col-form-label">Total ($)</label>
           <div class="col-sm-9">
-            <input type="text" readonly class="form-control-plaintext fw-bold" value="250">
+            <input id="total_cart" type="text" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity }}">
           </div>
         </div>
         
@@ -51,23 +54,33 @@
         </div>
       </form>
       <hr>
-      <div class="mb-3 row">
-        <label for="staticEmail" class="col-sm-3 col-form-label">Voucher</label>
-        <div class="col-sm-9">
-          <div class="input-group">
-            <input type="text" class="form-control">
-            <button class="btn btn-outline-secondary" type="button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                class="bi bi-plus-circle" viewBox="0 0 16 16">
-                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                <path
-                  d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-              </svg>
-              Add
-            </button>
+      <form action="{{ url_for('claim_voucher') }}" method="POST">
+        <div class="mb-3 row">
+          <label for="staticEmail" class="col-sm-3 col-form-label">Voucher</label>
+          <div class="col-sm-9">
+            <div class="input-group">
+                <input type="text" class="form-control" name="code" autocomplete="off">
+                <button class="btn btn-outline-secondary" type="submit">
+                  Apply
+                </button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+
+  qty = document.getElementById("quantity_cart")
+
+  qty.addEventListener("change", function(e) {
+    p = document.getElementById("price_cart").value
+    document.getElementById("total_cart").value = p * e.target.value;
+  });
+
+</script>
 {% endblock %}

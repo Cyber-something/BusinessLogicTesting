@@ -1,7 +1,9 @@
 from flask import Flask
-from flask import render_template, redirect
+from flask import render_template, redirect, request
 from flask.helpers import url_for
 from flask_sqlalchemy import SQLAlchemy
+
+user_id = 3
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
@@ -27,7 +29,39 @@ def logout():
 
 @app.get('/cart')
 def cart():
-    return render_template('cart.html')
+    u = User.query.filter_by(id=user_id).first()
+    crypto = Crypto.query.filter_by(id=u.crypto_id).first()
+    return render_template('cart.html', crypto=crypto, user=u)
+
+@app.get('/add_cart/<id>')
+def add_to_cart(id):
+    u = User.query.filter_by(id=user_id).first()
+    c = Crypto.query.filter_by(id=id).first()
+    if u and c:
+        u.crypto_id = c.id
+        u.price = c.price
+        u.quantity = 1
+        db.session.commit()
+    return redirect(url_for('cart'))
+
+@app.post('/claim_voucher')
+def claim_voucher():
+    # get the user id
+    c = request.form['code']
+    if c:
+        v = Voucher.query.filter_by(code=c.upper()).filter_by(user_id=None).first()
+        if v:
+            print("[+] Voucher found")
+            u = User.query.filter_by(id=user_id).first()
+            u.price = u.price * v.percentage / 100
+            u.discount = v.percentage
+            db.session.commit()
+        else:
+            print("[-] Invalid voucher")
+    else:
+        print("[-] No code provided")
+    return redirect(url_for('cart'))
+
 
 @app.get('/confirm')
 def confirm():
@@ -80,8 +114,10 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     sess = db.Column(db.String)
     credit = db.Column(db.Integer, default=100)
+    crypto_id = db.Column(db.Integer, db.ForeignKey('crypto.id'), default=None)
     quantity = db.Column(db.Integer, default=0)
     price = db.Column(db.Integer, default=0)
+    discount= db.Column(db.Integer, default=0)
 
     orders = db.relationship('Order', backref='user', lazy=True)
 
