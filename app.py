@@ -94,7 +94,7 @@ def claim_voucher():
 @app.get('/confirm')
 def confirm():
     u = User.query.filter_by(id=user_id).first()
-    print("Referrer: {}".format(request.referrer))
+    #print("Referrer: {}".format(request.referrer))
     return render_template('confirm.html', user=u)
 
 @app.post('/checkout')
@@ -104,7 +104,6 @@ def checkout():
     total = u.price * u.quantity
     if total > u.credit:
         msg = "Not enough funds"
-        print("[!] Error: {}".format(msg))
         return render_template('fail.html', msg=msg)
     else:
         return render_template('success.html')
