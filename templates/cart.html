@@ -11,76 +11,85 @@
         probably just keep going until we run out of words.</p>
     </div>
     <div class="col-6">
-      <form action="{{ url_for('confirm') }}">
+      <form action="{{ url_for('process_cart') }}" method="POST">
         <div class="mb-3 row">
-          <label for="staticEmail" class="col-sm-3 col-form-label">Price ($)</label>
+          <label for="price_cart" class="col-sm-3 col-form-label">Price ($)</label>
           <div class="col-sm-9">
-            <input id="price_cart" type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ crypto.price }}">
+            <input id="price_cart" type="text" readonly class="form-control-plaintext" name="price" value="{{ crypto.price }}">
           </div>
         </div>
         <div class="mb-3 row">
-          <label for="staticEmail" class="col-sm-3 col-form-label">Quantity</label>
+          <label for="quantity_cart" class="col-sm-3 col-form-label">Quantity</label>
           <div class="col-sm-9">
-            <select id="quantity_cart" class="form-select" aria-label="Default select example" onchange="update_total(this)">
-              {% for x in range(1,20) %}
-                {% if x == user.quantity %}
-                  <option value="{{ x }}" selected>{{ x }}</option>
-                {% else %}
-                  <option value="{{ x }}">{{ x }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
+            <div class="input-group">
+              <select class="form-select" id="quantity_cart" name="quantity">
+                {% for x in range(1,20) %}
+                  {% if x == user.quantity %}
+                    <option value="{{ x }}" selected>{{ x }}</option>
+                  {% else %}
+                    <option value="{{ x }}">{{ x }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn btn-outline-secondary" formaction="{{ url_for('update_cart') }}" formmethod="POST">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+                  <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
+                  <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"/>
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
 
         {% if user.discount > 0 %}
         <div class="mb-3 row">
-          <label for="staticEmail" class="col-sm-3 col-form-label">Discount (%)</label>
+          <label for="cart_discount" class="col-sm-3 col-form-label">Discount (%)</label>
           <div class="col-sm-9">
-            <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.discount }}">
+            <input type="text" readonly class="form-control-plaintext" id="cart_discount" name="discount" value="{{ user.discount }}">
           </div>
         </div>
         {% endif %}
 
         <div class="mb-3 row">
-          <label for="staticEmail" class="col-sm-3 col-form-label">Total ($)</label>
+          <label for="total_cart" class="col-sm-3 col-form-label">Total ($)</label>
           <div class="col-sm-9">
-            <input id="total_cart" type="text" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity }}">
+            <input id="total_cart" type="text" name="total" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity }}">
           </div>
         </div>
         
         <div class="col-sm-9 offset-sm-3">
-          <button type="submit" class="btn btn-success btn-lg">Place order</button>
+          <div class="btn-group" role="group">
+            <button type="submit" class="btn btn-outline-primary">Place order</button>
+            <button type="submit" class="btn btn-outline-danger" formaction="{{ url_for('clear_cart') }}" formmethod="POST">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
+                <path d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646 8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0 .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5 6.793 7.354 5.646z"/>
+                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+            </button>
+          </div>
         </div>
       </form>
       <hr>
       <form action="{{ url_for('claim_voucher') }}" method="POST">
         <div class="mb-3 row">
-          <label for="staticEmail" class="col-sm-3 col-form-label">Voucher</label>
+          <label for="code" class="col-sm-3 col-form-label">Voucher</label>
           <div class="col-sm-9">
             <div class="input-group">
-                <input type="text" class="form-control" name="code" autocomplete="off">
+                {% if user.discount == 0 %}
+                <input type="text" class="form-control" id="code" name="code" autocomplete="off">
                 <button class="btn btn-outline-secondary" type="submit">
                   Apply
                 </button>
+                {% else %}
+                <input type="text" class="form-control" id="code" name="code" autocomplete="off" value="{{ user.voucher_code }}" disabled>
+                <button class="btn btn-outline-secondary" type="submit" disabled>
+                  Apply
+                </button>
+                {% endif %}
             </div>
           </div>
         </div>
       </form>
     </div>
   </div>
-{% endblock %}
-
-
-{% block script %}
-<script>
-
-  qty = document.getElementById("quantity_cart")
-
-  qty.addEventListener("change", function(e) {
-    p = document.getElementById("price_cart").value
-    document.getElementById("total_cart").value = p * e.target.value;
-  });
-
-</script>
 {% endblock %}

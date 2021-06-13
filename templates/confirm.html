@@ -14,29 +14,34 @@
       probably just keep going until we run out of words.</p>
   </div>
   <div class="col-6">
-    <form>
+    <div class="alert alert-success" role="alert">
+      <strong>10 Credits</strong> awarded for your order
+    </div>
+    <form action="{{ url_for('checkout') }}" method="POST">
       <div class="mb-3 row">
         <label for="staticEmail" class="col-sm-3 col-form-label">Amount</label>
         <div class="col-sm-9">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="$125">
+          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.price }} * {{ user.quantity }}">
         </div>
       </div>
+      {% if user.discount > 0 %}
       <div class="mb-3 row">
         <label for="staticEmail" class="col-sm-3 col-form-label">Discount</label>
         <div class="col-sm-9">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="10%">
+          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.discount }}">
         </div>
       </div>
+      {% endif %}
       <div class="mb-3 row">
         <label for="staticEmail" class="col-sm-3 col-form-label">Total</label>
         <div class="col-sm-9">
-          <input type="text" readonly class="form-control-plaintext fw-bold" value="$250">
+          <input type="text" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity}}">
         </div>
       </div>
       <div class="mb-3 row">
         <label for="staticEmail" class="col-sm-3 col-form-label">Available credit</label>
         <div class="col-sm-9">
-          <input type="text" readonly class="form-control-plaintext text-muted" id="staticEmail" value="1500">
+          <input type="text" readonly class="form-control-plaintext text-muted" id="staticEmail" value="{{ user.credit }}">
         </div>
       </div>
       <hr>

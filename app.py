@@ -41,8 +41,35 @@ def add_to_cart(id):
         u.crypto_id = c.id
         u.price = c.price
         u.quantity = 1
+        u.discount = 0
         db.session.commit()
     return redirect(url_for('cart'))
+
+@app.post('/cart/update')
+def update_cart():
+    qty = request.form['quantity']
+    u = User.query.filter_by(id=user_id).first()
+    if u and qty:
+        u.quantity = qty
+        db.session.commit()
+    return redirect(url_for('cart'))
+
+@app.post('/cart/clear')
+def clear_cart():
+    u = User.query.filter_by(id=user_id).first()
+    if u:
+        u.crypto_id = None
+        u.quantity = 0
+        u.price = 0
+        u.discount = 0
+        u.voucher_code = None
+        db.session.commit()
+    return redirect(url_for('index'))
+
+@app.post('/cart/process')
+def process_cart():
+    return redirect(url_for('confirm'))
+
 
 @app.post('/claim_voucher')
 def claim_voucher():
@@ -53,8 +80,9 @@ def claim_voucher():
         if v:
             print("[+] Voucher found")
             u = User.query.filter_by(id=user_id).first()
-            u.price = u.price * v.percentage / 100
+            u.price = u.price - (u.price * v.percentage / 100)
             u.discount = v.percentage
+            u.voucher_code = v.code
             db.session.commit()
         else:
             print("[-] Invalid voucher")
@@ -65,7 +93,21 @@ def claim_voucher():
 
 @app.get('/confirm')
 def confirm():
-    return render_template('confirm.html')
+    u = User.query.filter_by(id=user_id).first()
+    print("Referrer: {}".format(request.referrer))
+    return render_template('confirm.html', user=u)
+
+@app.post('/checkout')
+def checkout():
+    # check if user has enough credit to actually buy the coins
+    u = User.query.filter_by(id=user_id).first()
+    total = u.price * u.quantity
+    if total > u.credit:
+        msg = "Not enough funds"
+        print("[!] Error: {}".format(msg))
+        return render_template('fail.html', msg=msg)
+    else:
+        return render_template('success.html')
 
 @app.get('/account')
 def account():
@@ -117,7 +159,8 @@ class User(db.Model):
     crypto_id = db.Column(db.Integer, db.ForeignKey('crypto.id'), default=None)
     quantity = db.Column(db.Integer, default=0)
     price = db.Column(db.Integer, default=0)
-    discount= db.Column(db.Integer, default=0)
+    discount = db.Column(db.Integer, default=0)
+    voucher_code = db.Column(db.String, default=None)
 
     orders = db.relationship('Order', backref='user', lazy=True)
 
