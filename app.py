@@ -155,6 +155,10 @@ def checkout():
         db.session.commit()
         return render_template('success.html')
 
+# -----------------------------------------------------------
+#   Account
+# -----------------------------------------------------------
+
 @app.get('/account')
 def account():
     return render_template('account_details.html', opt=1)
@@ -171,6 +175,10 @@ def transfer_credit():
 def claim_credit():
     return render_template('claim_credit.html', opt=4)
 
+# -----------------------------------------------------------
+#   Admin
+# -----------------------------------------------------------
+
 @app.get('/admin')
 def admin():
     return redirect(url_for("admin_users"))
@@ -180,10 +188,34 @@ def admin_users():
     users = User.query.all()
     return render_template('admin/admin_users.html', opt=1, users=users)
 
+@app.get('/admin/users/add_credit/<id>')
+def admin_add_credit(id):
+    u = User.query.filter_by(id=id).first()
+    if u:
+        u.credit += 50
+        db.session.commit()
+    return redirect(url_for('admin_users'))
+
 @app.get('/admin/crypto')
 def admin_crypto():
     crypto = Crypto.query.all()
     return render_template('admin/admin_crypto.html', opt=2, crypto=crypto)
+
+@app.get('/admin/crypto/inc/<id>')
+def inc_crypto_price(id):
+    c = Crypto.query.filter_by(id=id).first()
+    if c:
+        c.price += 5
+        db.session.commit()
+    return redirect(url_for('admin_crypto'))
+
+@app.get('/admin/crypto/dec/<id>')
+def dec_crypto_price(id):
+    c = Crypto.query.filter_by(id=id).first()
+    if c:
+        c.price -= 5
+        db.session.commit()
+    return redirect(url_for('admin_crypto'))
 
 @app.get('/admin/orders')
 def admin_orders():
@@ -195,6 +227,9 @@ def admin_vouchers():
     vouchers = Voucher.query.all()
     return render_template('admin/admin_vouchers.html', opt=4, vouchers=vouchers)
 
+# -----------------------------------------------------------
+#   Models
+# -----------------------------------------------------------
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

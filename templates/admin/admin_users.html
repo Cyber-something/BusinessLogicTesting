@@ -2,14 +2,38 @@
 
 {% block admin_content %}
 <ul class="list-group">
-  <li class="list-group-item list-group-item-secondary d-flex justify-content-between align-items-start">
-    <div><strong>Username</strong></div>
-    <div class="text-muted">Credit</div>
+  <li class="list-group-item list-group-item-secondary ">
+    <div class="row">
+      <div class="col-1">
+        Id
+      </div>
+      <div class="col">
+        Username
+      </div>
+      <div class="col-3">
+        Credit
+      </div>
+    </div>
   </li>
   {% for user in users %}
-  <li class="list-group-item d-flex justify-content-between align-items-start">
-    <div>{{ user.id }}. {{ user.username }}</div>
-    <div>{{ user.credit }}</div>
+  <li class="list-group-item">
+    <div class="row align-items-center">
+      <div class="col-1">
+        {{ user.id }}
+      </div>
+      <div class="col">
+        {{ user.username }}
+      </div>
+      <div class="col-3">
+        <div class="input-group">
+          <input type="text" class="form-control text-end border-primary" value="{{ user.credit }}" readonly>
+          <a class="btn btn-primary" role="button" href="{{ url_for('admin_add_credit',id=user.id) }}">
+            Add
+          </a>
+        </div>
+        
+      </div>
+    </div>
   </li>
   {% endfor %}
 </ul>

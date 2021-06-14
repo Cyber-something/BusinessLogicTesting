@@ -4,9 +4,9 @@ from app import sess_gen
 
 def init_app():
     # Add test users
-    u1 = User(username="alice", password="ark123")
-    u2 = User(username="bob", password="ark123")
-    u3 = User(username="charlie", password="ark123")
+    u1 = User(username="alice", password="ark123", credit=450)
+    u2 = User(username="bob", password="ark123", credit=300)
+    u3 = User(username="charlie", password="ark123", credit=560)
     u4 = User(username="admin", password="admin", is_admin=True)
 
     try:
