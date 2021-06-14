@@ -61,13 +61,13 @@ def logout():
 
 @app.get('/cart')
 def cart():
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     crypto = Crypto.query.filter_by(id=u.crypto_id).first()
     return render_template('cart.html', crypto=crypto, user=u)
 
 @app.get('/add_cart/<id>')
 def add_to_cart(id):
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     c = Crypto.query.filter_by(id=id).first()
     if u and c:
         u.crypto_id = c.id
@@ -80,7 +80,7 @@ def add_to_cart(id):
 @app.post('/cart/update')
 def update_cart():
     qty = request.form['quantity']
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     if u and qty:
         u.quantity = qty
         db.session.commit()
@@ -88,7 +88,7 @@ def update_cart():
 
 @app.post('/cart/clear')
 def clear_cart():
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     if u:
         u.crypto_id = None
         u.quantity = 0
@@ -100,7 +100,7 @@ def clear_cart():
 
 @app.post('/cart/process')
 def process_cart():
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     try:
         u.crypto_id = int(request.form['crypto_id'])
         u.price = int(request.form['price'])
@@ -119,7 +119,7 @@ def claim_voucher():
         v = Voucher.query.filter_by(code=c.upper()).filter_by(user_id=None).first()
         if v:
             print("[+] Voucher found")
-            u = User.query.filter_by(id=user_id).first()
+            u = User.query.filter_by(id=g.user.id).first()
             u.price = u.price - (u.price * v.percentage / 100)
             u.discount = v.percentage
             u.voucher_code = v.code
@@ -133,7 +133,7 @@ def claim_voucher():
 
 @app.get('/confirm')
 def confirm():
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     #print("Referrer: {}".format(request.referrer))
     # TODO: give the user 10 credit as loyalty for purchases
     return render_template('confirm.html', user=u)
@@ -141,7 +141,7 @@ def confirm():
 @app.post('/checkout')
 def checkout():
     # check if user has enough credit to actually buy the coins
-    u = User.query.filter_by(id=user_id).first()
+    u = User.query.filter_by(id=g.user.id).first()
     total = u.price * u.quantity
     if total > u.credit:
         msg = "Not enough funds"
