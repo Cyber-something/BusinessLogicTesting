@@ -1,14 +1,16 @@
 from app import db
 from app import User, Crypto, Order, Voucher
+from app import sess_gen
 
 def init_app():
     # Add test users
-    u1 = User(username="Alice", password="ark123")
-    u2 = User(username="Bob", password="ark123")
-    u3 = User(username="Charlie", password="ark123")
+    u1 = User(username="alice", password="ark123")
+    u2 = User(username="bob", password="ark123")
+    u3 = User(username="charlie", password="ark123")
+    u4 = User(username="admin", password="admin", is_admin=True)
 
     try:
-        db.session.add_all([u1,u2,u3])
+        db.session.add_all([u1,u2,u3,u4])
         db.session.commit()
         print("[+] Test users added")
     except Exception as e:

@@ -1,6 +1,6 @@
+import string, random
 from flask import Flask
-from flask import render_template, redirect, request
-from flask.helpers import url_for
+from flask import render_template, redirect, url_for, request, session, g
 from flask_sqlalchemy import SQLAlchemy
 
 user_id = 3
@@ -8,6 +8,7 @@ user_id = 3
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = "what3v3r"
 db = SQLAlchemy(app)
 
 
@@ -15,16 +16,47 @@ db = SQLAlchemy(app)
 def index():
     return render_template('index.html')
 
+@app.before_request
+def before_req():
+    if request.endpoint not in ['login','login_post','static']:
+        if 'user' not in session: #or 'user' not in g
+            return redirect(url_for('login'))
+        else:
+            # validate the session
+            usr = User.query.filter_by(sess=session['user']).first()
+            if usr:
+                g.user = usr
+            else:
+                print("[!] Invalid session")
+                session.pop('user',None)
+                return redirect(url_for('login'))
+
 @app.get('/login')
 def login():
+    if "user" in g:
+        print("[!] {}".format(g.user))
     return render_template('login.html')
 
 @app.post('/login')
 def login_post():
+    u = request.form['username']
+    p = request.form['password']
+    usr = User.query.filter_by(username=u).filter_by(password=p).first()
+    if usr:
+        sess = sess_gen()
+        usr.sess = sess
+        session['user'] = sess
+        db.session.commit()
+    else:
+        # maybe add some message flashing
+        print("[!] Bad username or password")
     return redirect(url_for('index'))
 
 @app.get('/logout')
 def logout():
+    session.pop('user',None)
+    g.user.sess = None
+    db.session.commit()
     return redirect(url_for('login'))
 
 @app.get('/cart')
@@ -68,6 +100,14 @@ def clear_cart():
 
 @app.post('/cart/process')
 def process_cart():
+    u = User.query.filter_by(id=user_id).first()
+    try:
+        u.crypto_id = int(request.form['crypto_id'])
+        u.price = int(request.form['price'])
+        u.quantity = int(request.form['quantity'])
+    except Exception as e:
+        print("There was an error: {}".format(e))
+
     return redirect(url_for('confirm'))
 
 
@@ -95,6 +135,7 @@ def claim_voucher():
 def confirm():
     u = User.query.filter_by(id=user_id).first()
     #print("Referrer: {}".format(request.referrer))
+    # TODO: give the user 10 credit as loyalty for purchases
     return render_template('confirm.html', user=u)
 
 @app.post('/checkout')
@@ -106,6 +147,12 @@ def checkout():
         msg = "Not enough funds"
         return render_template('fail.html', msg=msg)
     else:
+        # TODO: create a new order with the details
+        # TODO: subtract the amount from the users credit
+        o = Order(user_id=u.id, crypto_id=u.crypto_id, quantity=u.quantity, price=u.price)
+        db.session.add(o)
+        u.credit = u.credit - (u.price * u.quantity)
+        db.session.commit()
         return render_template('success.html')
 
 @app.get('/account')
@@ -153,6 +200,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
     sess = db.Column(db.String)
     credit = db.Column(db.Integer, default=100)
     crypto_id = db.Column(db.Integer, db.ForeignKey('crypto.id'), default=None)
@@ -160,7 +208,6 @@ class User(db.Model):
     price = db.Column(db.Integer, default=0)
     discount = db.Column(db.Integer, default=0)
     voucher_code = db.Column(db.String, default=None)
-
     orders = db.relationship('Order', backref='user', lazy=True)
 
     def __repr__(self):
@@ -172,7 +219,6 @@ class Crypto(db.Model):
     name = db.Column(db.String, unique=True, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     icon = db.Column(db.Text, nullable=False)
-
     orders = db.relationship('Order', backref='crypto', lazy=True)
 
     def __repr__(self):
@@ -191,11 +237,12 @@ class Voucher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
     percentage = db.Column(db.Integer, nullable=False, default=0)
-
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
     user = db.relationship('User', backref='vouchers', lazy=True)
 
+
+def sess_gen(size=6, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 if __name__ == '__main__':
     db.create_all()

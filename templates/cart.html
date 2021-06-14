@@ -12,6 +12,7 @@
     </div>
     <div class="col-6">
       <form action="{{ url_for('process_cart') }}" method="POST">
+        <input type="hidden" name="crypto_id" value="{{ user.crypto_id }}">
         <div class="mb-3 row">
           <label for="price_cart" class="col-sm-3 col-form-label">Price ($)</label>
           <div class="col-sm-9">
