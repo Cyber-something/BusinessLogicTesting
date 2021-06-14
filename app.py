@@ -219,7 +219,8 @@ def dec_crypto_price(id):
 
 @app.get('/admin/orders')
 def admin_orders():
-    orders = Order.query.all()
+    # User.query.order_by(User.id.desc()).all()
+    orders = Order.query.order_by(Order.id.desc()).all()
     return render_template('admin/admin_orders.html', opt=3, orders=orders)
 
 @app.get('/admin/vouchers')
