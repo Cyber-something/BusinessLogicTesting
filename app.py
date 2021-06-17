@@ -3,8 +3,6 @@ from flask import Flask
 from flask import render_template, redirect, url_for, request, session, g
 from flask_sqlalchemy import SQLAlchemy
 
-user_id = 3
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -14,7 +12,8 @@ db = SQLAlchemy(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    c = Crypto.query.all()
+    return render_template('index.html',crypto=c)
 
 @app.before_request
 def before_req():
@@ -47,10 +46,10 @@ def login_post():
         usr.sess = sess
         session['user'] = sess
         db.session.commit()
-    else:
-        # maybe add some message flashing
-        print("[!] Bad username or password")
-    return redirect(url_for('index'))
+        if usr.is_admin:
+            return redirect(url_for('admin_users'))
+        else:
+            return redirect(url_for('index'))
 
 @app.get('/logout')
 def logout():
