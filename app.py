@@ -161,15 +161,28 @@ def checkout():
 
 @app.get('/account')
 def account():
-    return render_template('account_details.html', opt=1)
+    return render_template('account/account_details.html', opt=1)
 
 @app.get('/account/order_history')
 def order_history():
-    return render_template('order_history.html', opt=2)
+    orders = g.user.orders
+    return render_template('account/order_history.html', opt=2, orders=orders)
 
 @app.get('/account/transfer')
 def transfer_credit():
-    return render_template('transfer_credit.html', opt=3)
+    users = User.query.filter_by(is_admin=False).all()
+    return render_template('account/transfer_credit.html', opt=3, users=users)
+
+@app.post('/account/transfer')
+def transfer_credit_user():
+    user2_id = request.form['selected_user']
+    amount = int(request.form['transfer_amount'])
+    if user2_id and amount != 0:
+        other_user = User.query.filter_by(id=user2_id).first()
+        g.user.credit -= amount
+        other_user.credit += amount
+        db.session.commit()
+    return redirect(url_for('transfer_credit'))
 
 @app.get('/account/claim')
 def claim_credit():

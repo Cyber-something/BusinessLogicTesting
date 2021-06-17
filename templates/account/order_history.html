@@ -1,0 +1,24 @@
+{% extends "account_template.html" %}
+
+{% block account %}
+<ul class="list-group">
+  <li class="list-group-item list-group-item-secondary">
+    <div class="row align-items-center">
+      <div class="col">Crypto</div>
+      <div class="col-1">Price</div>
+      <div class="col-1">Qty.</div>
+      <div class="col-1">Total</div>
+    </div>
+  </li>
+  {% for o in orders %}
+  <li class="list-group-item">
+    <div class="row">
+      <div class="col">{{ o.crypto.name }}</div>
+      <div class="col-1">{{ o.price }}</div>
+      <div class="col-1">{{ o.quantity }}</div>
+      <div class="col-1">{{ o.price * o.quantity }}</div>
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}
