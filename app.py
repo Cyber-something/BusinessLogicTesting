@@ -105,6 +105,7 @@ def process_cart():
         u.crypto_id = int(request.form['crypto_id'])
         u.price = int(request.form['price'])
         u.quantity = int(request.form['quantity'])
+        db.session.commit()
     except Exception as e:
         print("There was an error: {}".format(e))
 
@@ -152,6 +153,11 @@ def checkout():
         o = Order(user_id=u.id, crypto_id=u.crypto_id, quantity=u.quantity, price=u.price)
         db.session.add(o)
         u.credit = u.credit - (u.price * u.quantity)
+        u.crypto_id = None
+        u.quantity = 0
+        u.price = 0
+        u.discount = 0
+        u.voucher_code = None
         db.session.commit()
         return render_template('success.html')
 
@@ -165,7 +171,7 @@ def account():
 
 @app.get('/account/order_history')
 def order_history():
-    orders = g.user.orders
+    orders = Order.query.filter_by(user_id=g.user.id).order_by(Order.id.desc()).all()
     return render_template('account/order_history.html', opt=2, orders=orders)
 
 @app.get('/account/transfer')
