@@ -1,13 +1,18 @@
 from app import db
 from app import User, Crypto, Order, Voucher
 from app import sess_gen
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def init_app():
+
+    p1 = generate_password_hash("ark123")
+    p2 = generate_password_hash("admin")
+
     # Add test users
-    u1 = User(username="alice", password="ark123", credit=450)
-    u2 = User(username="bob", password="ark123", credit=300)
-    u3 = User(username="charlie", password="ark123", credit=560)
-    u4 = User(username="admin", password="admin", is_admin=True)
+    u1 = User(username="alice", password=p1, credit=450)
+    u2 = User(username="bob", password=p1, credit=300)
+    u3 = User(username="charlie", password=p1, credit=560)
+    u4 = User(username="admin", password=p2, is_admin=True)
 
     try:
         db.session.add_all([u1,u2,u3,u4])

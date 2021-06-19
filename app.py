@@ -1,7 +1,8 @@
 import string, random
 from flask import Flask
-from flask import render_template, redirect, url_for, request, session, g
+from flask import render_template, redirect, url_for, request, session, g, flash
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
@@ -40,16 +41,24 @@ def login():
 def login_post():
     u = request.form['username']
     p = request.form['password']
-    usr = User.query.filter_by(username=u).filter_by(password=p).first()
+    usr = User.query.filter_by(username=u).first()
     if usr:
-        sess = sess_gen()
-        usr.sess = sess
-        session['user'] = sess
-        db.session.commit()
-        if usr.is_admin:
-            return redirect(url_for('admin_users'))
+        if check_password_hash(usr.password,p):
+            sess = sess_gen()
+            usr.sess = sess
+            session['user'] = sess
+            db.session.commit()
+            if usr.is_admin:
+                return redirect(url_for('admin_users'))
+            else:
+                return redirect(url_for('index'))
         else:
-            return redirect(url_for('index'))
+            print("[!] Wrong password")
+            
+    else:
+        print("[!] Wrong username")
+    flash("Wrong username or password", "auth")
+    return redirect(url_for('login'))
 
 @app.get('/logout')
 def logout():
@@ -104,6 +113,7 @@ def process_cart():
         u.crypto_id = int(request.form['crypto_id'])
         u.price = int(request.form['price'])
         u.quantity = int(request.form['quantity'])
+        u.credit += 10
         db.session.commit()
     except Exception as e:
         print("There was an error: {}".format(e))
