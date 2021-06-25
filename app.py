@@ -185,7 +185,7 @@ def order_history():
 
 @app.get('/account/transfer')
 def transfer_credit():
-    users = User.query.filter_by(is_admin=False).all()
+    users = User.query.filter_by(is_admin=False).filter(User.id!=g.user.id).all()
     return render_template('account/transfer_credit.html', opt=3, users=users)
 
 @app.post('/account/transfer')
@@ -193,10 +193,12 @@ def transfer_credit_user():
     user2_id = request.form['selected_user']
     amount = int(request.form['transfer_amount'])
     if user2_id and amount != 0:
+        print("trnasfer {} from {} to user {}".format(amount,g.user.id,user2_id))
         other_user = User.query.filter_by(id=user2_id).first()
         g.user.credit -= amount
         other_user.credit += amount
         db.session.commit()
+
     return redirect(url_for('transfer_credit'))
 
 @app.get('/account/claim')
