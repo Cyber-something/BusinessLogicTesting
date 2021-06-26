@@ -201,9 +201,11 @@ def transfer_credit_user():
 
     return redirect(url_for('transfer_credit'))
 
+"""
 @app.get('/account/claim')
 def claim_credit():
     return render_template('claim_credit.html', opt=4)
+"""
 
 # -----------------------------------------------------------
 #   Admin
