@@ -34,12 +34,14 @@ def init_app():
         print("[!] Error: Crypto insert fail \n {}".format(e))
 
     # Add test vouchers
-    v1 = Voucher(code="FREE10", percentage=10, user_id=u2.id)
-    v2 = Voucher(code="SPRING15", percentage=15, user_id=u1.id)
+    v1 = Voucher(code="FREE10", percentage=10)
+    v2 = Voucher(code="SPRING15", percentage=15)
     v3 = Voucher(code="SALE25", percentage=25)
+    v4 = Voucher(code="SALE15", percentage=15)
+    v5 = Voucher(code="PS35", percentage=35)
 
     try:
-        db.session.add_all([v1, v2, v3])
+        db.session.add_all([v1, v2, v3, v4, v5])
         db.session.commit()
         print("[+] Added vouchers")
     except Exception as e:

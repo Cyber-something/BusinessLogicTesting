@@ -23,7 +23,7 @@
       </div>
       <div class="col">{{ v.percentage }}</div>
       <div class="col-2 d-grid">
-        <a class="btn btn-primary" href="#" role="button">Reset</a>
+        <a class="btn btn-primary" href="{{ url_for('reset_voucher', id=v.id) }}" role="button">Reset</a>
       </div>
     <div>
   </li>

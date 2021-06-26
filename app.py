@@ -57,7 +57,7 @@ def login_post():
             
     else:
         print("[!] Wrong username")
-    flash("Wrong username or password", "auth")
+    flash("Wrong username or password", "danger")
     return redirect(url_for('login'))
 
 @app.get('/logout')
@@ -70,8 +70,11 @@ def logout():
 @app.get('/cart')
 def cart():
     u = User.query.filter_by(id=g.user.id).first()
-    crypto = Crypto.query.filter_by(id=u.crypto_id).first()
-    return render_template('cart.html', crypto=crypto, user=u)
+    c = Crypto.query.filter_by(id=u.crypto_id).first()
+    if g.user.crypto_id: 
+        return render_template('cart.html', crypto=c, user=u)
+    else:
+        return redirect(url_for('index'))
 
 @app.get('/add_cart/<id>')
 def add_to_cart(id):
@@ -115,6 +118,7 @@ def process_cart():
         u.quantity = int(request.form['quantity'])
         u.credit += 10
         db.session.commit()
+        flash("10 Credits awarded for your order ", "info")
     except Exception as e:
         print("There was an error: {}".format(e))
 
@@ -133,10 +137,13 @@ def claim_voucher():
             u.price = u.price - (u.price * v.percentage / 100)
             u.discount = v.percentage
             u.voucher_code = v.code
+            v.user_id = g.user.id
             db.session.commit()
         else:
+            flash("Invalid Voucher", "warning")
             print("[-] Invalid voucher")
     else:
+        flash("No voucher code provided", "warning")
         print("[-] No code provided")
     return redirect(url_for('cart'))
 
@@ -144,9 +151,14 @@ def claim_voucher():
 @app.get('/confirm')
 def confirm():
     u = User.query.filter_by(id=g.user.id).first()
+    c = Crypto.query.filter_by(id=u.crypto_id).first()
+    reg_b = 0
+    if u.reg_bonus:
+        reg_b = 10
+    total = (int)(u.price * u.quantity * (100 - u.discount - reg_b) / 100)
     #print("Referrer: {}".format(request.referrer))
     # TODO: give the user 10 credit as loyalty for purchases
-    return render_template('confirm.html', user=u)
+    return render_template('confirm.html', user=u, t=total, crypto=c)
 
 @app.post('/checkout')
 def checkout():
@@ -167,6 +179,7 @@ def checkout():
         u.price = 0
         u.discount = 0
         u.voucher_code = None
+        u.reg_bonus = False
         db.session.commit()
         return render_template('success.html')
 
@@ -269,6 +282,14 @@ def admin_vouchers():
     vouchers = Voucher.query.all()
     return render_template('admin/admin_vouchers.html', opt=4, vouchers=vouchers)
 
+@app.get('/admin/vouchers/reset/<id>')
+def reset_voucher(id):
+    v = Voucher.query.filter_by(id=id).first()
+    if v:
+        v.user_id = None
+        db.session.commit()
+    return redirect(url_for('admin_vouchers'))
+
 # -----------------------------------------------------------
 #   Models
 # -----------------------------------------------------------
@@ -315,7 +336,7 @@ class Voucher(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String, nullable=False)
     percentage = db.Column(db.Integer, nullable=False, default=0)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=None)
     user = db.relationship('User', backref='vouchers', lazy=True)
 
 

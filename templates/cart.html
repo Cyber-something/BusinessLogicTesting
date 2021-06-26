@@ -2,26 +2,24 @@
 
 {% block content %}
   <div class="row">
-    <div class="col-6">
+    <div class="col-4">
       <div class="feature-icon bg-secondary bg-gradient">
         {{ crypto.icon|safe }}
       </div>
       <h2>{{ crypto.name }}</h2>
-      <p>Paragraph of text beneath the heading to explain the heading. We'll add onto it with another sentence and
-        probably just keep going until we run out of words.</p>
     </div>
-    <div class="col-6">
+    <div class="col-8">
       <form action="{{ url_for('process_cart') }}" method="POST">
         <input type="hidden" name="crypto_id" value="{{ user.crypto_id }}">
         <div class="mb-3 row">
-          <label for="price_cart" class="col-sm-3 col-form-label">Price ($)</label>
-          <div class="col-sm-9">
+          <label for="price_cart" class="col-sm-4 col-form-label">Price ($)</label>
+          <div class="col-sm-8">
             <input id="price_cart" type="text" readonly class="form-control-plaintext" name="price" value="{{ crypto.price }}">
           </div>
         </div>
         <div class="mb-3 row">
-          <label for="quantity_cart" class="col-sm-3 col-form-label">Quantity</label>
-          <div class="col-sm-9">
+          <label for="quantity_cart" class="col-sm-4 col-form-label">Quantity</label>
+          <div class="col-sm-8">
             <div class="input-group">
               <select class="form-select" id="quantity_cart" name="quantity">
                 {% for x in range(1,20) %}
@@ -44,37 +42,34 @@
 
         {% if user.discount > 0 %}
         <div class="mb-3 row">
-          <label for="cart_discount" class="col-sm-3 col-form-label">Discount (%)</label>
-          <div class="col-sm-9">
+          <label for="cart_discount" class="col-sm-4 col-form-label">Discount (%)</label>
+          <div class="col-sm-8">
             <input type="text" readonly class="form-control-plaintext" id="cart_discount" name="discount" value="{{ user.discount }}">
           </div>
         </div>
         {% endif %}
 
         <div class="mb-3 row">
-          <label for="total_cart" class="col-sm-3 col-form-label">Total ($)</label>
-          <div class="col-sm-9">
+          <label for="total_cart" class="col-sm-4 col-form-label">Total ($)</label>
+          <div class="col-sm-8">
             <input id="total_cart" type="text" name="total" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity }}">
           </div>
         </div>
         
-        <div class="col-sm-9 offset-sm-3">
-          <div class="btn-group" role="group">
-            <button type="submit" class="btn btn-outline-primary">Place order</button>
-            <button type="submit" class="btn btn-outline-danger" formaction="{{ url_for('clear_cart') }}" formmethod="POST">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-x" viewBox="0 0 16 16">
-                <path d="M7.354 5.646a.5.5 0 1 0-.708.708L7.793 7.5 6.646 8.646a.5.5 0 1 0 .708.708L8.5 8.207l1.146 1.147a.5.5 0 0 0 .708-.708L9.207 7.5l1.147-1.146a.5.5 0 0 0-.708-.708L8.5 6.793 7.354 5.646z"/>
-                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zm3.915 10L3.102 4h10.796l-1.313 7h-8.17zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-              </svg>
-            </button>
+        <div class="row">
+          <div class="col-sm-8 offset-4">
+            <div class="input-group">
+              <button type="submit" class="btn btn-outline-primary">Place order</button>
+              <button type="submit" class="btn btn-outline-danger" formaction="{{ url_for('clear_cart') }}" formmethod="POST">Cancel order</button>
+            </div>
           </div>
         </div>
       </form>
       <hr>
       <form action="{{ url_for('claim_voucher') }}" method="POST">
         <div class="mb-3 row">
-          <label for="code" class="col-sm-3 col-form-label">Voucher</label>
-          <div class="col-sm-9">
+          <label for="code" class="col-sm-4 col-form-label">Voucher</label>
+          <div class="col-sm-8">
             <div class="input-group">
                 {% if user.discount == 0 %}
                 <input type="text" class="form-control" id="code" name="code" autocomplete="off">

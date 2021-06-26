@@ -94,8 +94,18 @@
 
   <main>
     <div class="container-sm">
-        {% block content %}
-        {% endblock %}
+      {% with msg = get_flashed_messages(with_categories=true) %}
+        {% if msg %}
+          {% for c,m in msg %}
+          <div class="alert alert-{{ c }} alert-dismissible fade show" role="alert">
+            <strong>{{ c | title }}:</strong> {{ m }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {% block content %}
+      {% endblock %}
     </div>
   </main>
 
