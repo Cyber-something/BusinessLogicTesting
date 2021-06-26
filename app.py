@@ -69,59 +69,53 @@ def logout():
 
 @app.get('/cart')
 def cart():
-    u = User.query.filter_by(id=g.user.id).first()
-    c = Crypto.query.filter_by(id=u.crypto_id).first()
+    c = Crypto.query.filter_by(id=g.user.crypto_id).first()
     if g.user.crypto_id: 
-        return render_template('cart.html', crypto=c, user=u)
+        return render_template('cart.html', crypto=c)
     else:
         return redirect(url_for('index'))
 
 @app.get('/add_cart/<id>')
 def add_to_cart(id):
-    u = User.query.filter_by(id=g.user.id).first()
     c = Crypto.query.filter_by(id=id).first()
-    if u and c:
-        u.crypto_id = c.id
-        u.price = c.price
-        u.quantity = 1
-        u.discount = 0
+    if c:
+        g.user.crypto_id = c.id
+        g.user.price = c.price
+        g.user.quantity = 1
+        g.user.discount = 0
         db.session.commit()
     return redirect(url_for('cart'))
 
 @app.post('/cart/update')
 def update_cart():
     qty = request.form['quantity']
-    u = User.query.filter_by(id=g.user.id).first()
-    if u and qty:
-        u.quantity = qty
+    if qty:
+        g.user.quantity = qty
         db.session.commit()
     return redirect(url_for('cart'))
 
 @app.post('/cart/clear')
 def clear_cart():
-    u = User.query.filter_by(id=g.user.id).first()
-    if u:
-        u.crypto_id = None
-        u.quantity = 0
-        u.price = 0
-        u.discount = 0
-        u.voucher_code = None
+    if g.user.crypto_id:
+        g.user.crypto_id = None
+        g.user.quantity = 0
+        g.user.price = 0
+        g.user.discount = 0
+        g.user.voucher_code = None
         db.session.commit()
     return redirect(url_for('index'))
 
 @app.post('/cart/process')
 def process_cart():
-    u = User.query.filter_by(id=g.user.id).first()
     try:
-        u.crypto_id = int(request.form['crypto_id'])
-        u.price = int(request.form['price'])
-        u.quantity = int(request.form['quantity'])
-        u.credit += 10
+        g.user.crypto_id = int(request.form['crypto_id'])
+        g.user.price = int(request.form['price'])
+        g.user.quantity = int(request.form['quantity'])
+        g.user.credit += 10
         db.session.commit()
         flash("10 Credits awarded for your order ", "info")
     except Exception as e:
         print("There was an error: {}".format(e))
-
     return redirect(url_for('confirm'))
 
 
@@ -132,19 +126,15 @@ def claim_voucher():
     if c:
         v = Voucher.query.filter_by(code=c.upper()).filter_by(user_id=None).first()
         if v:
-            print("[+] Voucher found")
-            u = User.query.filter_by(id=g.user.id).first()
-            u.price = u.price - (u.price * v.percentage / 100)
-            u.discount = v.percentage
-            u.voucher_code = v.code
+            g.user.price = (int)(g.user.price - (g.user.price * v.percentage / 100))
+            g.user.discount = v.percentage
+            g.user.voucher_code = v.code
             v.user_id = g.user.id
             db.session.commit()
         else:
             flash("Invalid Voucher", "warning")
-            print("[-] Invalid voucher")
     else:
         flash("No voucher code provided", "warning")
-        print("[-] No code provided")
     return redirect(url_for('cart'))
 
 
@@ -152,34 +142,32 @@ def claim_voucher():
 def confirm():
     u = User.query.filter_by(id=g.user.id).first()
     c = Crypto.query.filter_by(id=u.crypto_id).first()
-    reg_b = 0
+    total = (int)(u.price * u.quantity * (100 - u.discount) / 100)
     if u.reg_bonus:
-        reg_b = 10
-    total = (int)(u.price * u.quantity * (100 - u.discount - reg_b) / 100)
+        total = (int)(u.price*0.9)
     #print("Referrer: {}".format(request.referrer))
     # TODO: give the user 10 credit as loyalty for purchases
     return render_template('confirm.html', user=u, t=total, crypto=c)
 
-@app.post('/checkout')
+@app.get('/checkout')
 def checkout():
     # check if user has enough credit to actually buy the coins
-    u = User.query.filter_by(id=g.user.id).first()
-    total = u.price * u.quantity
-    if total > u.credit:
+    total = g.user.price * g.user.quantity
+    if total > g.user.credit:
         msg = "Not enough funds"
         return render_template('fail.html', msg=msg)
     else:
-        # TODO: create a new order with the details
-        # TODO: subtract the amount from the users credit
-        o = Order(user_id=u.id, crypto_id=u.crypto_id, quantity=u.quantity, price=u.price)
+        if g.user.reg_bonus:
+            g.user.price = (int)(g.user.price * 0.9)
+        o = Order(user_id=g.user.id, crypto_id=g.user.crypto_id, quantity=g.user.quantity, price=g.user.price)
         db.session.add(o)
-        u.credit = u.credit - (u.price * u.quantity)
-        u.crypto_id = None
-        u.quantity = 0
-        u.price = 0
-        u.discount = 0
-        u.voucher_code = None
-        u.reg_bonus = False
+        g.user.credit = g.user.credit - (g.user.price * g.user.quantity)
+        g.user.crypto_id = None
+        g.user.quantity = 0
+        g.user.price = 0
+        g.user.discount = 0
+        g.user.voucher_code = None
+        g.user.reg_bonus = False
         db.session.commit()
         return render_template('success.html')
 

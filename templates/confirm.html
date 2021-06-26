@@ -9,45 +9,82 @@
     <h2>{{ crypto.name }}</h2>
   </div>
   <div class="col-8">
-    <form action="{{ url_for('checkout') }}" method="POST">
-      <div class="mb-2 row">
-        <label for="staticEmail" class="col-sm-4 col-form-label">Amount</label>
+      {% if user.discount > 0 or user.reg_bonus %}
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Normal Price
+        </div>
         <div class="col-sm-8">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.price }} * {{ user.quantity }}">
+          {{ crypto.price }}
         </div>
       </div>
-      <div class="mb-2 row">
-        <label for="staticEmail" class="col-sm-4 col-form-label">Subtotal</label>
-        <div class="col-sm-8">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.price * user.quantity }}">
-        </div>
-      </div>
-      <hr>
+      {% endif %}
       {% if user.discount > 0 %}
-      <div class="mb-2 row">
-        <label for="staticEmail" class="col-sm-4 col-form-label">Discount</label>
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Discount 
+          <small>({{ user.voucher_code }})</small>
+        </div>
         <div class="col-sm-8">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="{{ user.discount }} %">
+          {{ user.discount }} %
         </div>
       </div>
       {% endif %}
       {% if user.reg_bonus %}
-      <div class="mb-2 row">
-        <label for="staticEmail" class="col-sm-4 col-form-label">Registration bonus</label>
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Registration bonus
+        </div>
         <div class="col-sm-8">
-          <input type="text" readonly class="form-control-plaintext" id="staticEmail" value="10 %">
+          10 %
+        </div>
+      </div>
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Price
+        </div>
+        <div class="col-sm-8">
+          {{ (user.price*0.9)|int }}
+        </div>
+      </div>
+      {% else %}
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Price
+        </div>
+        <div class="col-sm-8">
+          {{ user.price }}
         </div>
       </div>
       {% endif %}
-      <div class="mb-2 row">
-        <label for="staticEmail" class="col-sm-4 col-form-label">Total</label>
+
+      
+
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          Quantity
+        </div>
         <div class="col-sm-8">
-          <input type="text" readonly class="form-control-plaintext fw-bold" value="{{ t }}">
+          {{ user.quantity }}
         </div>
       </div>
+
       <hr>
-      <div class="text-end">
-          <button type="submit" class="btn btn-primary btn-lg">Checkout!</button>
+
+      <div class="mb-3 row">
+        <div class="col-sm-4 text-muted">
+          <strong>Total</strong>
+        </div>
+        <div class="col-sm-8">
+          <strong>{{ t }}</strong>
+        </div>
+      </div>
+
+      <hr>
+      <div class="row">
+        <div class="d-grid">
+          <a role="button" href="{{ url_for('checkout') }}" class="btn btn-outline-success btn-lg">Checkout!</a>
+        </div>
       </div>
     </form>
 

@@ -10,20 +10,35 @@
     </div>
     <div class="col-8">
       <form action="{{ url_for('process_cart') }}" method="POST">
-        <input type="hidden" name="crypto_id" value="{{ user.crypto_id }}">
-        <div class="mb-3 row">
-          <label for="price_cart" class="col-sm-4 col-form-label">Price ($)</label>
+        <input type="hidden" name="crypto_id" value="{{ g.user.crypto_id }}">
+        {% if g.user.discount > 0 %}
+        <div class="mb-1 row">
+          <label for="price_crypto" class="col-sm-4 col-form-label">Normal price</label>
           <div class="col-sm-8">
-            <input id="price_cart" type="text" readonly class="form-control-plaintext" name="price" value="{{ crypto.price }}">
+            <input id="price_crypto" type="text" readonly class="form-control-plaintext" name="price_crypto" value="{{ crypto.price }}">
           </div>
         </div>
-        <div class="mb-3 row">
+        <div class="mb-1 row">
+          <label for="cart_discount" class="col-sm-4 col-form-label">Discount (%)</label>
+          <div class="col-sm-8">
+            <input type="text" readonly class="form-control-plaintext" id="cart_discount" name="discount" value="{{ g.user.discount }}">
+          </div>
+        </div>
+        {% endif %}
+        <div class="mb-1 row">
+          <label for="price_cart" class="col-sm-4 col-form-label">Price</label>
+          <div class="col-sm-8">
+            <input id="price_cart" type="text" readonly class="form-control-plaintext" name="price" value="{{ g.user.price }}">
+          </div>
+        </div>
+        <hr>
+        <div class="mb-1 row">
           <label for="quantity_cart" class="col-sm-4 col-form-label">Quantity</label>
           <div class="col-sm-8">
             <div class="input-group">
               <select class="form-select" id="quantity_cart" name="quantity">
                 {% for x in range(1,20) %}
-                  {% if x == user.quantity %}
+                  {% if x == g.user.quantity %}
                     <option value="{{ x }}" selected>{{ x }}</option>
                   {% else %}
                     <option value="{{ x }}">{{ x }}</option>
@@ -40,19 +55,12 @@
           </div>
         </div>
 
-        {% if user.discount > 0 %}
-        <div class="mb-3 row">
-          <label for="cart_discount" class="col-sm-4 col-form-label">Discount (%)</label>
-          <div class="col-sm-8">
-            <input type="text" readonly class="form-control-plaintext" id="cart_discount" name="discount" value="{{ user.discount }}">
-          </div>
-        </div>
-        {% endif %}
+        
 
         <div class="mb-3 row">
           <label for="total_cart" class="col-sm-4 col-form-label">Total ($)</label>
           <div class="col-sm-8">
-            <input id="total_cart" type="text" name="total" readonly class="form-control-plaintext fw-bold" value="{{ user.price * user.quantity }}">
+            <input id="total_cart" type="text" name="total" readonly class="form-control-plaintext fw-bold" value="{{ g.user.price * g.user.quantity }}">
           </div>
         </div>
         
@@ -71,13 +79,13 @@
           <label for="code" class="col-sm-4 col-form-label">Voucher</label>
           <div class="col-sm-8">
             <div class="input-group">
-                {% if user.discount == 0 %}
+                {% if g.user.discount == 0 %}
                 <input type="text" class="form-control" id="code" name="code" autocomplete="off">
                 <button class="btn btn-outline-secondary" type="submit">
                   Apply
                 </button>
                 {% else %}
-                <input type="text" class="form-control" id="code" name="code" autocomplete="off" value="{{ user.voucher_code }}" disabled>
+                <input type="text" class="form-control" id="code" name="code" autocomplete="off" value="{{ g.user.voucher_code }}" disabled>
                 <button class="btn btn-outline-secondary" type="submit" disabled>
                   Apply
                 </button>
