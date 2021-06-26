@@ -1,17 +1,32 @@
 {% extends "account_template.html" %}
 
 {% block account %}
-<div class="mb-3 row">
-  <label for="selected_user" class="col-sm-2 col-form-label">Credit</label>
-  <div class="col-sm-10">
-    <input type="text" class="form-control-plaintext" value="{{ g.user.credit }}" readonly>
+<div class="card-group">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Overview</h5>
+      <p class="card-text mb-0"><small class="text-muted">Credit</small></p>
+      <p class="card-text ps-3"><strong>{{ g.user.credit }}</strong></p>
+      <p class="card-text mb-0"><small class="text-muted">Orders</small></p>
+      <p class="card-text ps-3"><strong>{{ o | length }}</strong></p>
+      <p class="card-text mb-0"><small class="text-muted">Registration Discount</small></p>
+      <p class="card-text ps-3">
+        {% if g.user.reg_bonus %}
+        <span class="badge rounded-pill bg-success">Available</span>
+        {% else %}
+        <span class="badge rounded-pill bg-danger">Expired</span>
+        {% endif %}
+      </p>
+    </div>
   </div>
-</div>
-
-<div class="mb-3 row">
-  <label for="selected_user" class="col-sm-2 col-form-label">Orders</label>
-  <div class="col-sm-10">
-    <input type="text" class="form-control-plaintext" value="123" readonly>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Crypto</h5>
+      {% for x in dt %}
+      <p class="card-text mb-0"><small class="text-muted">{{ x['crypto']}}</small></p>
+      <p class="card-text ps-3"><strong>{{ x['amount'] }}</strong></p>
+      {% endfor %}
+    </div>
   </div>
 </div>
 

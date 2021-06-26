@@ -176,7 +176,16 @@ def checkout():
 
 @app.get('/account')
 def account():
-    return render_template('account/account_details.html', opt=1)
+    o = Order.query.filter_by(user_id=g.user.id).all()
+    c = Crypto.query.all()
+    dt = []
+    for i in c:
+        sum = 0
+        for j in o:
+            if i.id == j.crypto_id:
+                sum += j.quantity
+        dt.append({"crypto":i.name, "amount":sum})
+    return render_template('account/account_details.html', opt=1, o=o, dt=dt)
 
 @app.get('/account/order_history')
 def order_history():
@@ -270,6 +279,7 @@ class User(db.Model):
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     sess = db.Column(db.String)
+    reg_bonus = db.Column(db.Boolean, nullable=False, default=True)
     credit = db.Column(db.Integer, default=100)
     crypto_id = db.Column(db.Integer, db.ForeignKey('crypto.id'), default=None)
     quantity = db.Column(db.Integer, default=0)
