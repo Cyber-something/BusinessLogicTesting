@@ -3,13 +3,23 @@ A vulnerable Flask application to enable security professionals to experiment wi
 
 ## Install instructions
 ```bash
+# Install required components
+sudo apt install -y pip git gunicorn
+
+# Get the code of the application
 git clone https://github.com/Cyber-something/BusinessLogicTesting.git
 
-pip install requirements.txt
+cd BusinessLogicTesting
 
-python setup.py
+# Install dependencies
+pip install -r requirements.txt
 
-python app.py
+# Initialize the application and databse
+python3 setup.py
 
+# Start the application in debug mode
+python3 app.py
+
+# Run the application with Gunicorn
 gunicorn -w 4 --bind localhost:8081 wsgi:app
 ```
