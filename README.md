@@ -2,8 +2,9 @@
 A vulnerable Flask application to enable security professionals to experiment with and assess business logic vulnerabilities.
 
 ## Install instructions
-```bash
+```sh
 # Install required components
+sudo apt update
 sudo apt install -y pip git gunicorn
 
 # Get the code of the application
@@ -21,5 +22,9 @@ python3 setup.py
 python3 app.py
 
 # Run the application with Gunicorn
-gunicorn -w 4 --bind localhost:8081 wsgi:app
+gunicorn -w 2 --bind localhost:8081 wsgi:app
 ```
+
+### Default credentials
+Username: **student**  
+Password: **password**
