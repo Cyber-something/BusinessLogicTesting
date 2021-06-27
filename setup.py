@@ -5,17 +5,19 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 def init_app():
 
-    p1 = generate_password_hash("ark123")
+    p1 = generate_password_hash("password")
     p2 = generate_password_hash("admin")
 
     # Add test users
-    u1 = User(username="alice", password=p1, credit=450)
-    u2 = User(username="bob", password=p1, credit=300)
-    u3 = User(username="charlie", password=p1, credit=560)
-    u4 = User(username="admin", password=p2, is_admin=True)
+    u1 = User(username="admin", password=p2, is_admin=True)
+    u2 = User(username="alice", password=p1, credit=1450)
+    u3 = User(username="bob", password=p1, credit=1300)
+    u4 = User(username="charlie", password=p1, credit=1560)
+    u5 = User(username="student", password=p1, credit=2000)
+    
 
     try:
-        db.session.add_all([u1,u2,u3,u4])
+        db.session.add_all([u1,u2,u3,u4,u5])
         db.session.commit()
         print("[+] Test users added")
     except Exception as e:
@@ -67,3 +69,8 @@ def recycle_db():
         db.create_all()
     except Exception as e:
         print("[!] Error: Cannot reset database \n {}".format(e))
+
+
+if __name__ == "__main__":
+    recycle_db()
+    init_app()
