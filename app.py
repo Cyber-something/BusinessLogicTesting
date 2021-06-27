@@ -112,6 +112,10 @@ def process_cart():
         g.user.price = int(request.form['price'])
         g.user.quantity = int(request.form['quantity'])
         g.user.credit += 10
+        if request.form['reg_bonus'].lower() == "true":
+            g.user.reg_bonus = True
+        else:
+            g.user.reg_bonus = False
         db.session.commit()
         flash("10 Credits awarded for your order ", "info")
     except Exception as e:
@@ -200,14 +204,28 @@ def transfer_credit():
 
 @app.post('/account/transfer')
 def transfer_credit_user():
-    user2_id = request.form['selected_user']
-    amount = int(request.form['transfer_amount'])
-    if user2_id and amount != 0:
-        print("trnasfer {} from {} to user {}".format(amount,g.user.id,user2_id))
+    try:
+        user2_id = int(request.form['selected_user'])
         other_user = User.query.filter_by(id=user2_id).first()
+        if not other_user:
+            raise Exception()
+    except:
+        flash("Invalid user","danger")
+        return redirect(url_for('transfer_credit'))
+
+    try:
+        amount = int(request.form['transfer_amount'])
+    except:
+        flash("Invalid amount", "danger")
+        return redirect(url_for('transfer_credit'))
+
+    if amount < g.user.credit:
         g.user.credit -= amount
         other_user.credit += amount
         db.session.commit()
+        flash("Succesfully transferred {} to {}".format(amount,other_user.username),"success")
+    else:
+        flash("Insufficient funds", "warning")
 
     return redirect(url_for('transfer_credit'))
 

@@ -11,6 +11,7 @@
     <div class="col-8">
       <form action="{{ url_for('process_cart') }}" method="POST">
         <input type="hidden" name="crypto_id" value="{{ g.user.crypto_id }}">
+        <input type="hidden" name="reg_bonus" value="">
         {% if g.user.discount > 0 %}
         <div class="mb-1 row">
           <label for="price_crypto" class="col-sm-4 col-form-label">Normal price</label>
