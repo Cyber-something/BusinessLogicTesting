@@ -1,4 +1,4 @@
-![Image](static/cyberstorelogo_small.png?raw=true)
+![Image](static/cyberstorelogo_circle.png?raw=true)
 # BusinessLogicTesting | __Crypto Store__
 A vulnerable Flask application to enable security professionals to experiment with and assess business logic vulnerabilities.
 
