@@ -1,31 +1,43 @@
 ![Image](static/cyberstorelogo_xs.png?raw=true)
-# BusinessLogicTesting | **Crypto Store**
+# BusinessLogicTesting | __Crypto Store__
 A vulnerable Flask application to enable security professionals to experiment with and assess business logic vulnerabilities.
 
+## Disclaimer
+This is a vulnerable application please do not host this where it can be publicly accessed and exploited.
+
 ## Install instructions
+Update and install the required components
 ```sh
-# Install required components
 sudo apt update
 sudo apt install -y pip git gunicorn
-
-# Get the code of the application
+```
+Get the application by cloning it from the repo
+```sh
 git clone https://github.com/Cyber-something/BusinessLogicTesting.git
-
-cd BusinessLogicTesting
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Initialize the application and databse
-python3 setup.py
-
-# Start the application in debug mode
-python3 app.py
-
-# Run the application with Gunicorn
-gunicorn -w 2 --bind localhost:80 wsgi:app
 ```
 
-### Default credentials
-Username: **student**  
-Password: **password**
+Install all the required dependencies with Pip
+```sh
+cd BusinessLogicTesting
+pip install -r requirements.txt
+```
+
+Initialize the application by running setup.py before starting the application. The script can be run afterwards to reset all the contents of the DB 
+```sh
+python3 setup.py
+```
+
+The application can be started in debug mode
+```sh
+# 125.0.0.1:5000
+python3 app.py
+```
+
+Alternatively the application can run with Gunicorn as well
+```sh
+gunicorn -w 2 --bind localhost:5000 wsgi:app
+```
+
+## Default credentials
+Default username: __`student`__  
+Default password: __`password`__

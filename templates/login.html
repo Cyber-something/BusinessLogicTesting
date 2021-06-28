@@ -7,8 +7,15 @@
 {% block content %}
 <div class="row align-items-center">
   <div class="col-xl-7 text-lg-start">
-    <h1 class="display-4 fw-bold lh-1 mb-3">Welcome to the CryptoStore</h1>
-    <p class="col-lg-10 fs-4">If you don't have an account you're more than welcome to crease one</p>
+    <div class="row justify-content-md-center">
+      <div class="col-md-auto text-center mb-3">
+        <img src="{{ url_for('static', filename='cyberstorelogo_small.png')}}" class="image-fluid">
+      </div>
+      <div class="col-md">
+        <h1 class="display-4 fw-bold lh-1 mb-3">Welcome to the Crypto Store</h1>
+    <p class="col-lg-10 fs-4">A vulnerable Flask application that enables security professionals to experiment with and assess business logic vulnerabilities.</p>
+      </div>
+    </div>
   </div>
   
   <div class="mx-auto col-xl-5">
