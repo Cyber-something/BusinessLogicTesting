@@ -1,3 +1,4 @@
+![Image](static/cyberstorelogo.png)
 # BusinessLogicTesting | **Crypto Store**
 A vulnerable Flask application to enable security professionals to experiment with and assess business logic vulnerabilities.
 
@@ -22,7 +23,7 @@ python3 setup.py
 python3 app.py
 
 # Run the application with Gunicorn
-gunicorn -w 2 --bind localhost:8081 wsgi:app
+gunicorn -w 2 --bind localhost:80 wsgi:app
 ```
 
 ### Default credentials
