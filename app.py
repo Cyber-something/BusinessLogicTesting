@@ -148,7 +148,7 @@ def confirm():
     c = Crypto.query.filter_by(id=u.crypto_id).first()
     total = (int)(u.price * u.quantity * (100 - u.discount) / 100)
     if u.reg_bonus:
-        total = (int)(u.price*0.9)
+        total = (int)(total*0.9)
     #print("Referrer: {}".format(request.referrer))
     # TODO: give the user 10 credit as loyalty for purchases
     return render_template('confirm.html', user=u, t=total, crypto=c)
