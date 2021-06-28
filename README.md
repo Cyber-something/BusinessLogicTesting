@@ -5,7 +5,7 @@ A vulnerable Flask application to enable security professionals to experiment wi
 ## Disclaimer
 This is a vulnerable application please do not host this where it can be publicly accessed and exploited.
 
-## Install instructions
+## Installation instructions
 Update and install the required components
 ```sh
 sudo apt update
@@ -38,6 +38,5 @@ Alternatively the application can run with Gunicorn as well
 gunicorn -w 2 --bind localhost:5000 wsgi:app
 ```
 
-## Default credentials
-Default username: __`student`__  
-Default password: __`password`__
+### Default credentials
+`student:password`
